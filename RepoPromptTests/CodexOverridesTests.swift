@@ -484,7 +484,8 @@ final class CodexOverridesTests: XCTestCase {
 		assertConfigArgs(args, contain: "features.shell_tool=true")
 		assertConfigArgs(args, doNotContain: "features.unified_exec=false")
 		assertConfigArgs(args, contain: "mcp_servers.\(repoPromptName).enabled=true")
-		XCTAssertEqual(Array(args.suffix(3)), ["--json", "--skip-git-repo-check", "--full-auto"])
+		XCTAssertFalse(args.contains("--full-auto"))
+		XCTAssertEqual(Array(args.suffix(4)), ["--json", "--skip-git-repo-check", "--sandbox", "workspace-write"])
 	}
 
 	private func assertForcedAppServerConfig(
