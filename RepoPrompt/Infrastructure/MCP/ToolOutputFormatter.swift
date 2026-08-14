@@ -4700,7 +4700,7 @@ static func formatCodeStructure(value: Value) -> [MCP.Tool.Content] {
 
 					// Extract base: everything after "agentRaw:" minus the effort suffix
 					let afterColon = modelID.contains(":") ? String(modelID[modelID.index(after: modelID.firstIndex(of: ":")!)...]) : modelID
-					let effortSuffixes = ["-low", "-medium", "-high", "-xhigh", "-none", "-minimal"]
+					let effortSuffixes = ["-low", "-medium", "-high", "-xhigh", "-max", "-none", "-minimal"]
 					var base = afterColon
 					for suffix in effortSuffixes where base.lowercased().hasSuffix(suffix) {
 						base = String(base.dropLast(suffix.count))
@@ -4722,6 +4722,7 @@ static func formatCodeStructure(value: Value) -> [MCP.Tool.Content] {
 							.replacingOccurrences(of: " Medium", with: "")
 							.replacingOccurrences(of: " High", with: "")
 							.replacingOccurrences(of: " XHigh", with: "")
+							.replacingOccurrences(of: " Max", with: "")
 							.trimmingCharacters(in: .whitespaces)
 						families.append((base: base, name: baseName, efforts: [effort!]))
 					} else {

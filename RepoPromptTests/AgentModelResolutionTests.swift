@@ -364,6 +364,7 @@ final class AgentModelResolutionTests: XCTestCase {
 	func testClaudeMenuGroupsExpandedEffortOptions() throws {
 		let options = AgentModelCatalog.options(for: .claudeCode)
 		let menu = AgentModelCatalog.claudeMenu(for: options, agentKind: .claudeCode)
+		let fableGroup = try XCTUnwrap(menu.groups.first { $0.baseModelRaw == AgentModel.claudeFable5.rawValue })
 		let sonnetGroup = try XCTUnwrap(menu.groups.first { $0.baseModelRaw == AgentModel.claudeSonnet.rawValue })
 		let opusGroup = try XCTUnwrap(menu.groups.first { $0.baseModelRaw == AgentModel.claudeOpus.rawValue })
 		let haikuGroup = try XCTUnwrap(menu.groups.first { $0.baseModelRaw == AgentModel.claudeHaiku.rawValue })
@@ -371,6 +372,7 @@ final class AgentModelResolutionTests: XCTestCase {
 
 		XCTAssertEqual(menu.defaultOption?.rawValue, AgentModel.defaultModel.rawValue)
 		XCTAssertEqual(menu.groups.map(\.displayName), [
+			"Fable 5",
 			"Opus Latest (1M)",
 			"Opus Latest",
 			"Opus 4.7",
@@ -382,6 +384,17 @@ final class AgentModelResolutionTests: XCTestCase {
 			"Haiku Latest",
 			"Haiku 4.5"
 		])
+		XCTAssertEqual(fableGroup.options.map(\.rawValue), [
+			"claude-fable-5:low",
+			"claude-fable-5:medium",
+			"claude-fable-5:high",
+			"claude-fable-5:xhigh",
+			"claude-fable-5:max"
+		])
+		XCTAssertEqual(AgentModel.resolvedModel(forRaw: "claude-fable-5:max", agentKind: .claudeCode), .claudeFable5)
+		XCTAssertEqual(AgentModel.claudeFable5.contextWindowTokens, 1_000_000)
+		XCTAssertTrue(AgentModel.claudeFable5.isExtendedContext)
+
 		XCTAssertEqual(sonnetGroup.options.map(\.rawValue), [
 			"sonnet:low",
 			"sonnet:medium",
@@ -2020,7 +2033,8 @@ final class AgentModelResolutionTests: XCTestCase {
 		let options: [AgentModelOption] = [
 			AgentModelOption(rawValue: "opencode/zen/big-pickle", displayName: "OpenCode Zen/Big Pickle", description: nil, isDefault: false),
 			AgentModelOption(rawValue: "opencode/zen/big-pickle/high", displayName: "OpenCode Zen/Big Pickle (high)", description: nil, isDefault: false),
-			AgentModelOption(rawValue: "opencode/zen/big-pickle/max", displayName: "OpenCode Zen/Big Pickle (max)", description: nil, isDefault: false)
+			AgentModelOption(rawValue: "opencode/zen/big-pickle/max", displayName: "OpenCode Zen/Big Pickle (max)", description: nil, isDefault: false),
+			AgentModelOption(rawValue: "opencode/zen/big-pickle/xhigh", displayName: "OpenCode Zen/Big Pickle (xhigh)", description: nil, isDefault: false)
 		]
 
 		let menu = AgentModelCatalog.openCodeMenu(for: options)
@@ -2028,10 +2042,11 @@ final class AgentModelResolutionTests: XCTestCase {
 		XCTAssertEqual(menu.groups.count, 1)
 		XCTAssertEqual(menu.groups.first?.displayName, "OpenCode Zen/Big Pickle")
 		XCTAssertEqual(menu.groups.first?.rendersAsSubmenu, true)
-		XCTAssertEqual(menu.groups.first?.options.map(\.displayName), ["Default", "High", "Max"])
+		XCTAssertEqual(menu.groups.first?.options.map(\.displayName), ["Default", "High", "XHigh", "Max"])
 		XCTAssertEqual(menu.groups.first?.options.map { $0.option.rawValue }, [
 			"opencode/zen/big-pickle",
 			"opencode/zen/big-pickle/high",
+			"opencode/zen/big-pickle/xhigh",
 			"opencode/zen/big-pickle/max"
 		])
 	}

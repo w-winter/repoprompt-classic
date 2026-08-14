@@ -30,6 +30,17 @@ final class ToolOutputFormatterAgentExploreTests: XCTestCase {
 		XCTAssertTrue(text.contains("not `steer`"))
 	}
 
+	func testAgentManageGroupsMaxWithOtherReasoningEfforts() throws {
+		let text = try renderedText(
+			toolName: "agent_manage",
+			args: ["op": .string("list_agents")],
+			json: #"{"task_labels":[],"agents":[{"name":"Codex CLI","available":true,"capabilities":[],"models":[{"model_id":"codexExec:gpt-5.6-sol-low","name":"Codex CLI GPT-5.6 Sol Low","reasoning_effort":"low"},{"model_id":"codexExec:gpt-5.6-sol-xhigh","name":"Codex CLI GPT-5.6 Sol XHigh","reasoning_effort":"xhigh"},{"model_id":"codexExec:gpt-5.6-sol-max","name":"Codex CLI GPT-5.6 Sol Max","reasoning_effort":"max"}]}]}"#
+		)
+
+		XCTAssertTrue(text.contains("`codexExec:gpt-5.6-sol-{low|xhigh|max}` — Codex CLI GPT-5.6 Sol"))
+		XCTAssertFalse(text.contains("gpt-5.6-sol-max-{max}"))
+	}
+
 	func testAgentExploreBatchStartEnvelopeUsesExploreHeading() throws {
 		let text = try renderedText(
 			toolName: "agent_explore",

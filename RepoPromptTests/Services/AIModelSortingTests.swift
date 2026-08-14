@@ -326,6 +326,9 @@ final class AIModelSortingTests: XCTestCase {
 		let rawValues = Set(AIModel.modelsForProvider(.claudeCode).map(\.rawValue))
 
 		XCTAssertTrue(rawValues.contains("claude-code"))
+		XCTAssertTrue(rawValues.contains("claude_code__claude-fable-5"))
+		XCTAssertTrue(rawValues.contains("claude_code__claude-fable-5:xhigh"))
+		XCTAssertTrue(rawValues.contains("claude_code__claude-fable-5:max"))
 		XCTAssertTrue(rawValues.contains("opus"))
 		XCTAssertTrue(rawValues.contains("claude_code__opus[1m]"))
 		XCTAssertTrue(rawValues.contains("claude_code__claude-opus-4-7"))
@@ -343,13 +346,17 @@ final class AIModelSortingTests: XCTestCase {
 		let menu = AIModel.claudeCodeMenu(for: AIModel.modelsForProvider(.claudeCode))
 
 		XCTAssertNil(menu.defaultOption)
-		XCTAssertEqual(Array(menu.groups.prefix(5)).map(\.displayName), [
+		XCTAssertEqual(Array(menu.groups.prefix(6)).map(\.displayName), [
+			"Fable 5",
 			"Opus Latest (1M)",
 			"Opus Latest",
 			"Opus 4.7",
 			"Opus 4.6",
 			"Opus 4.5"
 		])
+		let fable5 = menu.groups.first { $0.displayName == "Fable 5" }
+		XCTAssertEqual(fable5?.rendersAsSubmenu, true)
+		XCTAssertEqual(fable5?.options.map(\.displayName), ["Low", "Medium", "High", "XHigh", "Max"])
 		let opus47 = menu.groups.first { $0.displayName == "Opus 4.7" }
 		XCTAssertEqual(opus47?.rendersAsSubmenu, true)
 		XCTAssertEqual(opus47?.options.map(\.displayName), ["Low", "Medium", "High", "XHigh"])

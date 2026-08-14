@@ -32,6 +32,31 @@ final class CodexDynamicModelMapperTests: XCTestCase {
 		XCTAssertTrue(medium?.isDefault == true)
 	}
 
+	func testDynamicGPT56ModelsExposeMaxReasoningEffort() throws {
+		let model = CodexAppServerClient.RemoteModel(
+			id: "gpt-5.6-sol",
+			model: "gpt-5.6-sol",
+			displayName: "gpt-5.6-sol",
+			description: "GPT-5.6 Sol model",
+			isDefault: true,
+			supportedReasoningEfforts: [
+				CodexAppServerClient.RemoteReasoningEffort(reasoningEffort: "high", description: "High effort"),
+				CodexAppServerClient.RemoteReasoningEffort(reasoningEffort: "max", description: "Max effort"),
+				CodexAppServerClient.RemoteReasoningEffort(reasoningEffort: "xhigh", description: "XHigh effort")
+			],
+			defaultReasoningEffort: "high"
+		)
+
+		let options = CodexDynamicModelMapper.options(from: [model])
+
+		XCTAssertEqual(options.map(\.id), ["gpt-5.6-sol-high", "gpt-5.6-sol-xhigh", "gpt-5.6-sol-max"])
+		XCTAssertEqual(options.map(\.displayName), ["GPT-5.6 Sol High", "GPT-5.6 Sol XHigh", "GPT-5.6 Sol Max"])
+		XCTAssertLessThan(
+			try XCTUnwrap(CodexReasoningEffort.displayOrder.firstIndex(of: .xhigh)),
+			try XCTUnwrap(CodexReasoningEffort.displayOrder.firstIndex(of: .max))
+		)
+	}
+
 	func testDynamicGPT55CodexModelsDisplayAsGPT55() {
 		let model = CodexAppServerClient.RemoteModel(
 			id: "gpt-5.5",
@@ -112,6 +137,15 @@ final class CodexDynamicModelMapperTests: XCTestCase {
 		let minimalSpecifier = CodexModelSpecifier(raw: "gpt-5.2-MINIMAL")
 		XCTAssertEqual(minimalSpecifier.baseModel, "gpt-5.2")
 		XCTAssertEqual(minimalSpecifier.reasoningEffort, .minimal)
+
+		let maxSpecifier = CodexModelSpecifier(raw: "gpt-5.6-sol-MAX")
+		XCTAssertEqual(maxSpecifier.baseModel, "gpt-5.6-sol")
+		XCTAssertEqual(maxSpecifier.reasoningEffort, .max)
+		XCTAssertEqual(maxSpecifier.cliReasoningConfigArgs, ["-c", "model_reasoning_effort=max"])
+
+		let maxNamedBaseModel = CodexModelSpecifier(raw: "gpt-5.1-codex-max")
+		XCTAssertEqual(maxNamedBaseModel.baseModel, "gpt-5.1-codex-max")
+		XCTAssertNil(maxNamedBaseModel.reasoningEffort)
 	}
 
 	func testCodexModelSpecifierParsesGPT55CodexRawIDAndCLIArgs() {

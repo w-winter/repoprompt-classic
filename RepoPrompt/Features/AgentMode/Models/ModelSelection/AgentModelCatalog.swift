@@ -979,7 +979,7 @@ enum AgentModelCatalog {
 		}
 	}
 
-	private static let claudeMenuEffortOrder: [ClaudeCodeEffortLevel] = [.low, .medium, .high, .max, .xhigh]
+	private static let claudeMenuEffortOrder: [ClaudeCodeEffortLevel] = [.low, .medium, .high, .xhigh, .max]
 
 	private static func supportedClaudeEfforts(forBaseModelRaw baseModelRaw: String, agentKind: DiscoverAgentKind?) -> [ClaudeCodeEffortLevel] {
 		claudeMenuEffortOrder.filter {
@@ -1024,6 +1024,7 @@ enum AgentModelCatalog {
 	/// Opus Latest, Opus 1M, and pinned Opus full IDs support XHigh.
 	/// Sonnet, Haiku, and GLM deliberately do not support XHigh.
 	private static let claudeXHighEligibleBaseRaws: Set<String> = [
+		AgentModel.claudeFable5.rawValue.lowercased(),
 		AgentModel.claudeOpus.rawValue.lowercased(),
 		AgentModel.claudeOpus1m.rawValue.lowercased(),
 		AgentModel.claudeOpus47.rawValue.lowercased(),
@@ -1331,8 +1332,8 @@ enum AgentModelCatalog {
 		case .low: return 2
 		case .medium: return 3
 		case .high: return 4
-		case .max: return 5
-		case .xhigh: return 6
+		case .xhigh: return 5
+		case .max: return 6
 		}
 	}
 

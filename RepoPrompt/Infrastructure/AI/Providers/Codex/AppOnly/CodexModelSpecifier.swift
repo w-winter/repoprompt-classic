@@ -32,24 +32,28 @@ struct CodexModelSpecifier: Sendable, Equatable {
 			return (nil, nil, nil)
 		}
 
-		// First strip any reasoning effort suffix
-		let suffixes: [(suffix: String, effort: ReasoningEffort)] = [
-			("-xhigh", .xhigh),
-			("-medium", .medium),
-			("-minimal", .minimal),
-			("-high", .high),
-			("-none", .none),
-			("-low", .low)
+		// First strip any reasoning effort suffix. Max is gated to GPT-5.6 families so the
+		// legitimate base model `gpt-5.1-codex-max` is not misread as a max-effort selection.
+		let suffixes: [(suffix: String, effort: ReasoningEffort, requiresMaxSupport: Bool)] = [
+			("-xhigh", .xhigh, false),
+			("-maximum", .max, true),
+			("-max", .max, true),
+			("-medium", .medium, false),
+			("-minimal", .minimal, false),
+			("-high", .high, false),
+			("-none", .none, false),
+			("-low", .low, false)
 		]
 		var base = raw
 		var effort: ReasoningEffort? = nil
 		let lowered = raw.lowercased()
-		for (suffix, e) in suffixes where lowered.hasSuffix(suffix) {
+		for (suffix, candidateEffort, requiresMaxSupport) in suffixes where lowered.hasSuffix(suffix) {
 			let candidate = String(raw.dropLast(suffix.count))
 				.trimmingCharacters(in: .whitespacesAndNewlines)
-			if !candidate.isEmpty {
+			guard !candidate.isEmpty else { break }
+			if !requiresMaxSupport || Self.supportsMaxEffort(forBaseCandidate: candidate) {
 				base = candidate
-				effort = e
+				effort = candidateEffort
 			}
 			break
 		}
@@ -72,6 +76,21 @@ struct CodexModelSpecifier: Sendable, Equatable {
 		}
 
 		return (base, effort, tier)
+	}
+
+	private static func supportsMaxEffort(forBaseCandidate candidate: String) -> Bool {
+		let supportBase = serviceTierStrippedBase(candidate).lowercased()
+		return ["gpt-5.6", "gpt-5.6-sol", "gpt-5.6-terra", "gpt-5.6-luna"].contains(supportBase)
+	}
+
+	private static func serviceTierStrippedBase(_ candidate: String) -> String {
+		var base = candidate.trimmingCharacters(in: .whitespacesAndNewlines)
+		let tierSuffix = "-\(CodexServiceTierVariantCatalog.fastServiceTier)"
+		if base.lowercased().hasSuffix(tierSuffix) {
+			base = String(base.dropLast(tierSuffix.count))
+				.trimmingCharacters(in: .whitespacesAndNewlines)
+		}
+		return base
 	}
 
 	var cliModelArgs: [String] {
