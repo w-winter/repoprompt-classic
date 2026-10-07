@@ -9,6 +9,9 @@ import SwiftUI
 import AppKit
 import Markdown
 
+// Markdown also declares `Text`; the macOS 27 SDK's SwiftUI builders otherwise resolve to it.
+private typealias Text = SwiftUI.Text
+
 // MARK: - Token Usage Indicator
 private struct TokenUsageIndicator: View {
 	let inputTokens: Int
