@@ -1024,9 +1024,11 @@ enum AgentModelCatalog {
 	/// Opus Latest, Opus 1M, and pinned Opus full IDs support XHigh.
 	/// Sonnet, Haiku, and GLM deliberately do not support XHigh.
 	private static let claudeXHighEligibleBaseRaws: Set<String> = [
+		AgentModel.claudeFable51.rawValue.lowercased(),
 		AgentModel.claudeFable5.rawValue.lowercased(),
 		AgentModel.claudeOpus.rawValue.lowercased(),
 		AgentModel.claudeOpus1m.rawValue.lowercased(),
+		AgentModel.claudeOpus55.rawValue.lowercased(),
 		AgentModel.claudeOpus47.rawValue.lowercased(),
 		AgentModel.claudeOpus46.rawValue.lowercased(),
 		AgentModel.claudeOpus45.rawValue.lowercased(),

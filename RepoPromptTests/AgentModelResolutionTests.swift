@@ -354,6 +354,8 @@ final class AgentModelResolutionTests: XCTestCase {
 		XCTAssertTrue(AgentModelCatalog.isValid(rawModel: "opus:xhigh", for: .claudeCode))
 		XCTAssertTrue(AgentModelCatalog.isValid(rawModel: "opus[1m]:xhigh", for: .claudeCode))
 		XCTAssertTrue(AgentModelCatalog.isValid(rawModel: "opus[1m]:max", for: .claudeCode))
+		XCTAssertTrue(AgentModelCatalog.isValid(rawModel: "claude-fable-5-1:xhigh", for: .claudeCode))
+		XCTAssertTrue(AgentModelCatalog.isValid(rawModel: "claude-opus-5-5:xhigh", for: .claudeCode))
 		XCTAssertFalse(AgentModelCatalog.isValid(rawModel: "sonnet:xhigh", for: .claudeCode))
 		XCTAssertFalse(AgentModelCatalog.isValid(rawModel: "haiku:xhigh", for: .claudeCode))
 		XCTAssertFalse(AgentModelCatalog.isValid(rawModel: "default:xhigh", for: .claudeCode))
@@ -372,9 +374,11 @@ final class AgentModelResolutionTests: XCTestCase {
 
 		XCTAssertEqual(menu.defaultOption?.rawValue, AgentModel.defaultModel.rawValue)
 		XCTAssertEqual(menu.groups.map(\.displayName), [
+			"Fable 5.1",
 			"Fable 5",
 			"Opus Latest (1M)",
 			"Opus Latest",
+			"Opus 5.5",
 			"Opus 4.7",
 			"Opus 4.6",
 			"Opus 4.5",

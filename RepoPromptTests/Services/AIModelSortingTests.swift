@@ -346,10 +346,12 @@ final class AIModelSortingTests: XCTestCase {
 		let menu = AIModel.claudeCodeMenu(for: AIModel.modelsForProvider(.claudeCode))
 
 		XCTAssertNil(menu.defaultOption)
-		XCTAssertEqual(Array(menu.groups.prefix(6)).map(\.displayName), [
+		XCTAssertEqual(Array(menu.groups.prefix(8)).map(\.displayName), [
+			"Fable 5.1",
 			"Fable 5",
 			"Opus Latest (1M)",
 			"Opus Latest",
+			"Opus 5.5",
 			"Opus 4.7",
 			"Opus 4.6",
 			"Opus 4.5"
